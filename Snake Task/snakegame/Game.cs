@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Media;
 using System.Threading;
 
 namespace SnakeGame
@@ -11,9 +10,9 @@ namespace SnakeGame
         private Point food;
         private Direction currentDirection = Direction.Right;
         private bool gameOver = false;
-        private SoundPlayer eatSound = new SoundPlayer("eat.wav");
-        private SoundPlayer deadSound = new SoundPlayer("dead.wav");
-        private SoundPlayer bgMusic = new SoundPlayer("bg.wav");
+        private Sound eatSound = new Sound("eat.wav");
+        private Sound deadSound = new Sound("dead.wav");
+        private Sound bgMusic = new Sound("bg.wav");
 
         private int score = 0;
         private const string scoreFile = "scores.txt";
@@ -56,11 +55,7 @@ namespace SnakeGame
                 if (snake.Head.Equals(food))
                 {
                     score++;
-                    new Thread(() =>
-                    {
-                        eatSound.PlaySync();
-                        bgMusic.Play();
-                    }).Start();
+                    eatSound.Play();
 
                     GenerateFood();
                     grow = true;
@@ -83,7 +78,12 @@ namespace SnakeGame
             Console.SetCursorPosition(0, Config.Height);
             Console.WriteLine($"Game Over! Final score: {score}");
             SaveScore();
+
+            bgMusic.Dispose();
+            eatSound.Dispose();
+            deadSound.Dispose();
         }
+
 
         private void ReadInput()
         {
