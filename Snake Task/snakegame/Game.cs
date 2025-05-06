@@ -1,12 +1,19 @@
+using NAudio.Wave;
+using System.Threading;
+
 class Game
 {
     private Snake snake;
     private Point food;
     private Direction currentDirection = Direction.Right;
     private bool gameOver = false;
-    private SoundPlayer eatSound = new SoundPlayer("eat.wav");
-    private SoundPlayer deadSound = new SoundPlayer("dead.wav");
-    private SoundPlayer bgMusic = new SoundPlayer("bg.wav");
+
+    private WaveOutEvent bgPlayer;
+    private AudioFileReader bgMusic;
+
+    private string eatSoundPath = "eat.wav";
+    private string deadSoundPath = "dead.wav";
+    private string bgMusicPath = "bg.wav";
 
     private int score = 0;
     private const string scoreFile = "scores.txt";
@@ -37,7 +44,11 @@ class Game
         DrawBorder();
         GenerateFood();
 
-        bgMusic.Play();
+        // запуск фоновой музыки
+        bgMusic = new AudioFileReader(bgMusicPath);
+        bgPlayer = new WaveOutEvent();
+        bgPlayer.Init(bgMusic);
+        bgPlayer.Play();
 
         Thread inputThread = new Thread(ReadInput);
         inputThread.Start();
@@ -49,12 +60,7 @@ class Game
             if (snake.Head.Equals(food))
             {
                 score++;
-                new Thread(() =>
-                {
-                    eatSound.PlaySync();
-                    bgMusic.Play();
-                }).Start();
-
+                PlayOneShot(eatSoundPath);
                 GenerateFood();
                 grow = true;
             }
@@ -64,8 +70,8 @@ class Game
             if (snake.IsHitWall() || snake.IsHitSelf())
             {
                 gameOver = true;
-                bgMusic.Stop();
-                deadSound.Play();
+                bgPlayer.Stop();
+                PlayOneShot(deadSoundPath);
                 break;
             }
 
@@ -76,6 +82,24 @@ class Game
         Console.SetCursorPosition(0, Config.Height);
         Console.WriteLine($"Game Over! Final score: {score}");
         SaveScore();
+
+        bgMusic?.Dispose();
+        bgPlayer?.Dispose();
+    }
+
+    private void PlayOneShot(string file)
+    {
+        new Thread(() =>
+        {
+            using var audioFile = new AudioFileReader(file);
+            using var outputDevice = new WaveOutEvent();
+            outputDevice.Init(audioFile);
+            outputDevice.Play();
+            while (outputDevice.PlaybackState == PlaybackState.Playing)
+            {
+                Thread.Sleep(10);
+            }
+        }).Start();
     }
 
     private void ReadInput()
@@ -87,22 +111,22 @@ class Game
                 var key = Console.ReadKey(true).Key;
                 switch (key)
                 {
-                case ConsoleKey.UpArrow:
-                    if (currentDirection != Direction.Down)
-                        currentDirection = Direction.Up;
-                    break;
-                case ConsoleKey.DownArrow:
-                    if (currentDirection != Direction.Up)
-                        currentDirection = Direction.Down;
-                    break;
-                case ConsoleKey.LeftArrow:
-                    if (currentDirection != Direction.Right)
-                        currentDirection = Direction.Left;
-                    break;
-                case ConsoleKey.RightArrow:
-                    if (currentDirection != Direction.Left)
-                        currentDirection = Direction.Right;
-                    break;
+                    case ConsoleKey.UpArrow:
+                        if (currentDirection != Direction.Down)
+                            currentDirection = Direction.Up;
+                        break;
+                    case ConsoleKey.DownArrow:
+                        if (currentDirection != Direction.Up)
+                            currentDirection = Direction.Down;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        if (currentDirection != Direction.Right)
+                            currentDirection = Direction.Left;
+                        break;
+                    case ConsoleKey.RightArrow:
+                        if (currentDirection != Direction.Left)
+                            currentDirection = Direction.Right;
+                        break;
                 }
             }
             else
@@ -122,22 +146,18 @@ class Game
 
     private void Draw()
     {
-        // score
         Console.SetCursorPosition(2, Config.Height);
         Console.Write($"Score: {score}");
 
-        // clear the tail
         if (snake.LastTail.HasValue)
         {
             Console.SetCursorPosition(snake.LastTail.Value.X, snake.LastTail.Value.Y);
             Console.Write(' ');
         }
 
-        // food
         Console.SetCursorPosition(food.X, food.Y);
         Console.Write('O');
 
-        // head
         var head = snake.Head;
         Console.SetCursorPosition(head.X, head.Y);
         Console.Write('#');
