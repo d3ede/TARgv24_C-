@@ -10,11 +10,11 @@ namespace TARgv24_C_.OOP
     {
         static void Main(string[] args)
         {   //1.1
-            Inimene inimene = new Inimene("Andrei",20);
+            Inimene inimene = new Inimene("Matviei",20);
             inimene.Tervita();
             
             //2.2
-            Töötaja töötaja = new Töötaja("Andrei", 20, "Developer");
+            Töötaja töötaja = new Töötaja("Matviei", 20, "Developer");
             töötaja.Töötan();
             
             //3.3
