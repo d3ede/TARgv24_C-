@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static TARgv24_C_.OOP.Ülesanne.Ülesanne_OOP;
 
 namespace TARgv24_C_.OOP.Ülesanne
 {
