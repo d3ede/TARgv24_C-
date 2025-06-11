@@ -8,8 +8,8 @@ namespace TARgv24_C_Sharp.Kangelane
 {
     class Kangelane
     {
-        private string nimi;
-        private string asukoht;
+        //private string nimi;
+        //private string asukoht;
 
         public string Nimi { get; set; }
         public string Asukoht { get; set; }

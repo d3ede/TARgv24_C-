@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -42,7 +43,7 @@ namespace TARgv24_C_Sharp.Kangelane
 
         static void Main(string[] args)
         {
-            string path = @"..\..\..\Kangelane\andmed.txt";
+            string path = @"X:\Work\Code\TTHK TARgv24\Sharp\Kangelane Ylesanne\andmed.txt";
             LoeKangelasedFailist(path);
 
             foreach (Kangelane kangelane in kangelased)
