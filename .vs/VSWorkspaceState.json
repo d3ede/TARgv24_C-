@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Snake Task",
+    "\\Snake Task\\snakegame"
   ],
-  "SelectedNode": "\\C:\\Users\\thesk\\Source\\Repos\\TARgv24_C-",
+  "SelectedNode": "\\Snake Task\\snakegame\\SnakeGame.sln",
   "PreviewInSolutionExplorer": false
 }
